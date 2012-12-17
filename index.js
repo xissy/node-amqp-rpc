@@ -48,7 +48,7 @@ rpc.prototype._connect = function(cb)  {
     this.__connCbs.push(cb);
 
     this.__conn = amqp.createConnection(
-        {url: this.__url},
+        {url: this.__url, heartbeat: 1},
         {defaultExchangeName: this.__exchange_name}
     );
 
@@ -62,6 +62,14 @@ rpc.prototype._connect = function(cb)  {
         for(var i=0; i< cbs.length; i++)    {
             cbs[i]($this.__conn);
         }
+    });
+
+    this.__conn.addListener('close', function(){
+        console.log("connection closed.");
+    });
+
+    this.__conn.addListener('heartbeat', function(){
+        // console.log("heartbeat");
     });
 }
 /**
